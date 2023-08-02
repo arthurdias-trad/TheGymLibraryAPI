@@ -9,13 +9,7 @@ public class Exercise
     public required string Name { get; set; }
     public required string Description { get; set; }
     public string? VideoURL { get; set; }
-    [NotMapped]
-    public string[]? MusclesWorked { get; set; }
-    public string MusclesWorkedJson
-    {
-        get => JsonSerializer.Serialize(MusclesWorked);
-        set => MusclesWorked = JsonSerializer.Deserialize<string[]>(value);
-    }
+    public ICollection<MuscleGroup>? MuscleGroups { get; set; }
     public ExerciseType Type { get; set; }
 
 }
