@@ -43,7 +43,7 @@ public class ExerciseService : IExerciseService
         if (exercise is null) return null;
 
         exercise.Name = request.Name;
-        exercise.MusclesWorked = request.MusclesWorked;
+        exercise.MuscleGroups = request.MuscleGroups;
         exercise.Description = request.Description;
         exercise.VideoURL = request.VideoURL;
         exercise.Type = request.Type;
