@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using DotNetAPI.Models;
+using TheGymAPI.Models;
 
 public interface IExerciseService
 {

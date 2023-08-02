@@ -1,8 +1,8 @@
-using DotNetAPI.Models;
+using TheGymAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using TheGymAPI.Data;
 
-namespace DotNetAPI.Services;
+namespace TheGymAPI.Services;
 
 public class ExerciseService : IExerciseService
 {

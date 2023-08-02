@@ -1,4 +1,4 @@
-using DotNetAPI.Services;
+using TheGymAPI.Services;
 using TheGymAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);

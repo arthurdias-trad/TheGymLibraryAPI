@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using DotNetAPI.Models;
+using TheGymAPI.Models;
 
 namespace TheGymAPI.Data
 {
@@ -7,7 +7,7 @@ namespace TheGymAPI.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-            
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -16,6 +16,15 @@ namespace TheGymAPI.Data
             optionsBuilder.UseSqlServer("Server=.\\SQLExpress;Database=thegymdb;Trusted_Connection=true;TrustServerCertificate=true");
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<MuscleGroup>(entity =>
+            {
+                entity.HasIndex(e => e.Name).IsUnique();
+            });
+        }
+
         public DbSet<Exercise> Exercises { get; set; }
+        public DbSet<MuscleGroup> MuscleGroups { get; set; }
     }
 }

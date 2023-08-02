@@ -1,4 +1,4 @@
-using DotNetAPI.Models;
+using TheGymAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
-namespace DotNetAPI.Models;
+namespace TheGymAPI.Models;
 
 public class Exercise
 {
