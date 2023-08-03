@@ -1,5 +1,6 @@
 using TheGymAPI.Services;
 using TheGymAPI.Data;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

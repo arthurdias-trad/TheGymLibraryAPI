@@ -22,6 +22,9 @@ namespace TheGymAPI.Data
             {
                 entity.HasIndex(e => e.Name).IsUnique();
             });
+            modelBuilder.Entity<Exercise>()
+                .HasMany(e => e.MuscleGroups)
+                .WithMany(mg => mg.Exercises);
         }
 
         public DbSet<Exercise> Exercises { get; set; }

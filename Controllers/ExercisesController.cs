@@ -1,6 +1,7 @@
 using TheGymAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TheGymAPI.Models.DTOs;
 
 [ApiController]
 [Route("[controller]")]
@@ -27,11 +28,10 @@ public class ExercisesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(Exercise exercise)
+    public async Task<IActionResult> Create(ExerciseDTO exerciseDTO)
     {
-        Exercise newExercise = await _exerciseService.Add(exercise);
-        Console.WriteLine(newExercise);
-        return CreatedAtAction(nameof(Get), new { id = exercise.Id }, exercise);
+        Exercise newExercise = await _exerciseService.Add(exerciseDTO);
+        return CreatedAtAction(nameof(Get), new { id = newExercise.Id }, newExercise);
     }
 
     [HttpPut("{id}")]

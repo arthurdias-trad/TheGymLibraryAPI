@@ -1,6 +1,7 @@
 using TheGymAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using TheGymAPI.Data;
+using TheGymAPI.Models.DTOs;
 
 namespace TheGymAPI.Services;
 
@@ -15,24 +16,57 @@ public class ExerciseService : IExerciseService
 
     public async Task<List<Exercise>> GetAllAsync()
     {
-        var exercises = await _context.Exercises.ToListAsync();
+        var exercises = await _context.Exercises.Include(e => e.MuscleGroups).ToListAsync();
         return exercises;
     }
 
     public async Task<Exercise?> Get(int id)
     {
-        return await _context.Exercises.FindAsync(id);
+        return await _context.Exercises
+            .Include(e => e.MuscleGroups)
+            .FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public async Task<Exercise?> GetByName(string name)
     {
-        Exercise? exercise = await _context.Exercises.FirstOrDefaultAsync(e => e.Name == name);
+        Exercise? exercise = await _context.Exercises
+            .Include(e => e.MuscleGroups)
+            .FirstOrDefaultAsync(e => e.Name == name);
         return exercise;
     }
 
-    public async Task<Exercise> Add(Exercise newExercise)
+    public async Task<Exercise> Add(ExerciseDTO newExerciseDTO)
     {
-        await _context.Exercises.AddAsync(newExercise);
+        Exercise newExercise = new Exercise
+        {
+            Name = newExerciseDTO.Name,
+            Description = newExerciseDTO.Description,
+            Type = newExerciseDTO.Type,
+            VideoURL = newExerciseDTO.VideoURL
+        };
+
+        newExercise.Name = newExerciseDTO.Name;
+        newExercise.Description = newExerciseDTO.Description;
+        newExercise.Type = newExerciseDTO.Type;
+        newExercise.VideoURL = newExerciseDTO.VideoURL;
+
+        foreach (var name in newExerciseDTO.MuscleGroups)
+        {
+            var muscleGroup = await _context.MuscleGroups.FirstOrDefaultAsync(mg => mg.Name == name);
+
+            if (muscleGroup == null)
+            {
+                muscleGroup = new MuscleGroup { Name = name, Exercises = new List<Exercise> { newExercise } };
+                await _context.MuscleGroups.AddAsync(muscleGroup);
+                await _context.SaveChangesAsync();
+            }
+
+            await _context.Exercises.AddAsync(newExercise);
+
+            newExercise.MuscleGroups.Add(muscleGroup);
+        }
+
+        
         await _context.SaveChangesAsync();
         return newExercise;
     }
@@ -63,6 +97,5 @@ public class ExerciseService : IExerciseService
         await _context.SaveChangesAsync();
         return exercise;
     }
-
 }
 
