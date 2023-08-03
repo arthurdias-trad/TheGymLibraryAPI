@@ -35,17 +35,16 @@ public class ExercisesController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Exercise exercise)
+    public async Task<IActionResult> Update(int id, ExerciseDTO exerciseDTO)
     {
-        Console.WriteLine("Controller working");
-        if (exercise.Id != id)
+        if (exerciseDTO.Id != id)
         {
             return BadRequest();
         }
 
         try
         {
-            Exercise? updatedExercise = await _exerciseService.Update(id, exercise);
+            Exercise? updatedExercise = await _exerciseService.Update(id, exerciseDTO);
             if (updatedExercise is null)
             {
                 return BadRequest();
