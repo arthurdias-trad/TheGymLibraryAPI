@@ -2,6 +2,7 @@ using TheGymAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using TheGymAPI.Data;
 using TheGymAPI.Models.DTOs;
+using Microsoft.IdentityModel.Tokens;
 
 namespace TheGymAPI.Services;
 
@@ -50,6 +51,7 @@ public class ExerciseService : IExerciseService
         newExercise.Type = newExerciseDTO.Type;
         newExercise.VideoURL = newExerciseDTO.VideoURL;
 
+        // Convert the Muscle Group from strings into objects
         foreach (var name in newExerciseDTO.MuscleGroups)
         {
             var muscleGroup = await _context.MuscleGroups.FirstOrDefaultAsync(mg => mg.Name == name);
@@ -58,29 +60,61 @@ public class ExerciseService : IExerciseService
             {
                 muscleGroup = new MuscleGroup { Name = name, Exercises = new List<Exercise> { newExercise } };
                 await _context.MuscleGroups.AddAsync(muscleGroup);
-                await _context.SaveChangesAsync();
             }
 
-            await _context.Exercises.AddAsync(newExercise);
 
             newExercise.MuscleGroups.Add(muscleGroup);
         }
 
-        
+        await _context.Exercises.AddAsync(newExercise);
         await _context.SaveChangesAsync();
         return newExercise;
     }
 
-    public async Task<Exercise?> Update(int id, Exercise request)
+    public async Task<Exercise?> Update(int id, ExerciseDTO request)
     {
         Exercise? exercise = await _context.Exercises.FindAsync(id);
         if (exercise is null) return null;
 
         exercise.Name = request.Name;
-        exercise.MuscleGroups = request.MuscleGroups;
         exercise.Description = request.Description;
         exercise.VideoURL = request.VideoURL;
         exercise.Type = request.Type;
+
+        if (!request.MuscleGroups.IsNullOrEmpty())
+        {
+            List<MuscleGroup> newMuscleGroups = new List<MuscleGroup>();
+
+            List<string> currentMuscleGroupNames = exercise.MuscleGroups.Select(mg => mg.Name).ToList();
+
+            foreach (string name in request.MuscleGroups)
+            {
+                // Checks if muscle group is already present in the exercise and adds it.
+                if (currentMuscleGroupNames.Contains(name))
+                {
+                    newMuscleGroups.Add(exercise.MuscleGroups.First(mg => mg.Name == name));
+                    continue;
+                }
+
+                // If muscle group is not present, either fetch it from DB or create it.
+                else
+                { 
+                    MuscleGroup? muscleGroup = await _context.MuscleGroups.FirstOrDefaultAsync(mg => mg.Name == name);
+
+                    if (muscleGroup == null)
+                    {
+                        muscleGroup = new MuscleGroup { Name = name, Exercises = new List<Exercise> { exercise } };
+                        await _context.MuscleGroups.AddAsync(muscleGroup);
+                    }
+
+                    newMuscleGroups.Add(muscleGroup);
+                }
+                
+            }
+            exercise.MuscleGroups = newMuscleGroups;
+        }
+
+        
 
         await _context.SaveChangesAsync();
 
